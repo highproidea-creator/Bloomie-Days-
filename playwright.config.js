@@ -7,7 +7,7 @@ export default defineConfig({
   timeout: 60_000,
   expect: { timeout: 15_000 },
   use: {
-    baseURL: 'http://127.0.0.1:4173',
+    baseURL: 'http://127.0.0.1:4173/Bloomie-Days-/',
     trace: 'retain-on-failure',
     launchOptions: {
       executablePath: process.env.CHROMIUM_PATH || undefined,
@@ -20,7 +20,7 @@ export default defineConfig({
   ],
   webServer: {
     command: 'npm run preview -- --port 4173 --strictPort',
-    url: 'http://127.0.0.1:4173',
+    url: 'http://127.0.0.1:4173/Bloomie-Days-/',
     reuseExistingServer: !process.env.CI,
     timeout: 30_000,
   },

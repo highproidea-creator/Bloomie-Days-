@@ -4,7 +4,7 @@ test('shop opens, every flower can be explored, and the player returns outside',
   const errors = [], remote = [];
   page.on('pageerror', error => errors.push(error.message));
   page.on('request', request => { if (!request.url().startsWith('http://127.0.0.1:4173') && !request.url().startsWith('data:')) remote.push(request.url()); });
-  await page.goto('/');
+  await page.goto('./');
   const open = page.getByRole('button', { name: 'Welcome / Open' });
   await expect(open).toBeEnabled();
   await expect(page.locator('#scene canvas')).toBeVisible();
@@ -46,7 +46,7 @@ test('shop opens, every flower can be explored, and the player returns outside',
 
 test('system reduced motion, keyboard dialog dismissal, and help work', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
-  await page.goto('/');
+  await page.goto('./');
   await expect(page.getByRole('button', { name: 'Welcome / Open' })).toBeEnabled();
   await expect(page.locator('#motion-button')).toHaveAttribute('aria-pressed', 'true');
   await page.getByRole('button', { name: 'วิธีเล่น', exact: true }).click();
@@ -67,7 +67,7 @@ test('missing WebGL shows a helpful fallback', async ({ page }) => {
       return getContext.call(this, type, ...args);
     };
   });
-  await page.goto('/');
+  await page.goto('./');
   await expect(page.getByRole('heading', { name: 'เปิดสวนสามมิติไม่ได้' })).toBeVisible();
   await expect(page.getByRole('button', { name: 'ลองอีกครั้ง' })).toBeVisible();
 });
