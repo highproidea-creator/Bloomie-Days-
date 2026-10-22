@@ -41,7 +41,24 @@ npx playwright install chromium
 npm run test:e2e
 ```
 
-หากมี Chromium ในเครื่องอยู่แล้ว ใช้ `CHROMIUM_PATH=/usr/bin/chromium npm run test:e2e` ได้ ชุดทดสอบรันกับ production build ที่พอร์ต 4173 ดังนั้นให้ build ก่อน E2E ทุกครั้ง ทดสอบหน้าร้าน เข้า–ออก เปิดข้อมูลดอกไม้ทั้ง 8 ชนิด การลดแอนิเมชัน หน้าช่วยเหลือ กรณีไม่มี WebGL และทั้งขนาดเดสก์ท็อป/มือถือ พร้อมจับภาพใน `test-results/`
+หากมี Chromium ในเครื่องอยู่แล้ว ใช้ `CHROMIUM_PATH=/usr/bin/chromium npm run test:e2e` ได้ ชุดทดสอบรันกับ production build ที่พอร์ต 4173 ภายใต้ `/Bloomie-Days-/` เหมือน GitHub Pages ดังนั้นให้ build ก่อน E2E ทุกครั้ง ทดสอบหน้าร้าน เข้า–ออก เปิดข้อมูลดอกไม้ทั้ง 8 ชนิด การลดแอนิเมชัน หน้าช่วยเหลือ กรณีไม่มี WebGL และทั้งขนาดเดสก์ท็อป/มือถือ พร้อมจับภาพใน `test-results/`
+
+## เผยแพร่ฟรีด้วย GitHub Pages
+
+หลังรวม PR นี้เข้า `main` และ workflow deploy สำเร็จ เกมจะเปิดได้ที่:
+
+**https://highproidea-creator.github.io/Bloomie-Days-/**
+
+ใช้ GitHub Pages และ GitHub Actions บน Linux runner มาตรฐานสำหรับ public repository ไม่ต้องใช้บริการเสียเงิน โดเมนส่วนตัว หรือ secret เพิ่มเติม
+
+1. ใน repository ไปที่ **Settings → Pages → Build and deployment → Source** และเลือก **GitHub Actions** (หากตั้งไว้แล้วไม่ต้องเปลี่ยน)
+2. `.github/workflows/deploy.yml` จะตรวจ `npm ci`, `npm test` และ `npm run build` เมื่อเปิด/อัปเดต PR ที่เข้า `main`
+3. เมื่อ merge หรือ push เข้า `main` ระบบจะ build, อัปโหลดเฉพาะ `dist/` และ deploy ไป environment `github-pages` โดยใช้ `GITHUB_TOKEN` ที่ GitHub ให้ใน workflow
+4. ดูผลและ URL ในแท็บ **Actions → Deploy Bloomie Days to GitHub Pages** ได้ และกด **Run workflow** บน branch `main` เพื่อ deploy ซ้ำได้ การรันจาก branch อื่นจะตรวจ build โดยไม่ deploy
+
+Vite กำหนด `base: '/Bloomie-Days-/'` เพื่อให้ JavaScript, CSS, ฟอนต์ และ favicon โหลดจาก path ของ repository ถูกต้อง โหมด dev/preview ในเครื่องจึงเปิดที่ path นี้ด้วย หากเปลี่ยนชื่อ repository ต้องแก้ `base`, URL ในเอกสาร และ base URL ของ Playwright ให้ตรงกัน
+
+PR จะตรวจ build โดยไม่เผยแพร่เว็บ ก่อน workflow deploy ครั้งแรกสำเร็จ URL ด้านบนอาจตอบ 404; ให้ตรวจ Source ของ Pages และ log ของ workflow หาก deploy ล้มเหลว
 
 ## โครงสร้าง
 
