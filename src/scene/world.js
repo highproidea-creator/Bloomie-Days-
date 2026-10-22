@@ -19,55 +19,70 @@ export function createWorld(container, { onFlower, onVisitComplete, reducedMotio
   const fill = new THREE.DirectionalLight('#f8dce0', 1.1); fill.position.set(6, 5, -4); scene.add(fill);
   const floor = new THREE.Mesh(new THREE.PlaneGeometry(200, 200), new THREE.ShadowMaterial({ color: '#7a8061', opacity: 0.14 }));
   floor.rotation.x = -Math.PI / 2; floor.position.y = -0.63; floor.receiveShadow = true; scene.add(floor);
-  const { door, roof, cat, pickables } = buildShop(scene);
+  const { door, roof, cat } = buildShop(scene);
   const raycaster = new THREE.Raycaster(); const pointer = new THREE.Vector2();
-  const outside = new THREE.Vector3(), outsideTarget = new THREE.Vector3(0, 1.8, 0.35);
-  const inside = new THREE.Vector3(0.03, 3.25, 2.53), insideTarget = new THREE.Vector3(0.2, 1.3, -0.6);
+  const poses = {
+    outside: { position: new THREE.Vector3(), target: new THREE.Vector3(0, 1.8, 0.35), fov: 34, offset: new THREE.Vector2() },
+    introducing: { position: new THREE.Vector3(0.35, 2.8, 3.2), target: new THREE.Vector3(0.35, 1.3, -0.65), fov: 58, offset: new THREE.Vector2() },
+    browsing: { position: new THREE.Vector3(1.05, 3.0, 1.7), target: new THREE.Vector3(2.24, 1.55, -1.28), fov: 55, offset: new THREE.Vector2() },
+  };
+  const look = poses.outside.target.clone(), offset = new THREE.Vector2();
   let reduced = reducedMotion, transition = null, phase = 'outside', elapsed = 0, lastTime = null, frame = null, disposed = false, paused = false;
-  let outsideFov = 34, insideFov = 72;
   let pointerStart = null;
 
+  function project() {
+    const width = container.clientWidth, height = container.clientHeight;
+    camera.setViewOffset(width, height, width * offset.x, height * offset.y, width, height);
+    camera.updateProjectionMatrix(); camera.lookAt(look);
+  }
+  function applyPose(name) {
+    const pose = poses[name]; camera.position.copy(pose.position); look.copy(pose.target);
+    camera.fov = pose.fov; offset.copy(pose.offset); project();
+  }
   function resize() {
     const width = container.clientWidth, height = container.clientHeight;
     renderer.setSize(width, height); camera.aspect = width / height;
     const mobile = width < 760;
-    outside.set(mobile ? 12.8 : 14.0, mobile ? 9.0 : 10.2, mobile ? 18.8 : 20.0);
-    outsideFov = mobile ? 41 : 34; insideFov = mobile ? 88 : 72;
-    camera.fov = phase === 'inside' ? insideFov : outsideFov;
-    camera.setViewOffset(width, height, -width * (mobile ? 0 : 0.042), -height * (mobile ? 0.09 : 0.025), width, height);
-    camera.updateProjectionMatrix();
-    if (!transition) { camera.position.copy(phase === 'inside' ? inside : outside); camera.lookAt(phase === 'inside' ? insideTarget : outsideTarget); }
+    poses.outside.position.set(mobile ? 19 : 14, mobile ? 13 : 10.2, mobile ? 27 : 20);
+    poses.outside.fov = mobile ? 45 : 34;
+    poses.introducing.fov = mobile ? 66 : 58;
+    poses.browsing.offset.set(mobile ? 0 : 0.22, mobile ? 0.20 : 0);
+    if (!transition) applyPose(phase); else project();
     draw();
   }
 
-  function travel(entering) {
-    phase = entering ? 'entering' : 'leaving';
-    const target = entering ? inside : outside;
-    transition = { entering, startedAt: performance.now(), from: camera.position.clone(), to: target.clone(), targetFrom: entering ? outsideTarget.clone() : insideTarget.clone(), targetTo: entering ? insideTarget.clone() : outsideTarget.clone() };
+  function travel(kind) {
+    const destination = { entering: 'introducing', 'moving-to-flowers': 'browsing', leaving: 'outside' }[kind];
+    phase = kind;
+    transition = { kind, destination, startedAt: performance.now(), duration: kind === 'moving-to-flowers' ? 2400 : 3000,
+      from: camera.position.clone(), fromTarget: look.clone(), fromFov: camera.fov, fromOffset: offset.clone(), to: poses[destination] };
     renderer.shadowMap.needsUpdate = true;
     startLoop();
   }
   function updateTransition() {
     const t = transition;
-    const progress = reduced ? 1 : Math.min((performance.now() - t.startedAt) / 3000, 1);
+    const progress = reduced ? 1 : Math.min((performance.now() - t.startedAt) / t.duration, 1);
     // Door opens first. The camera travels through its actual doorway.
-    const doorProgress = Math.min(progress / 0.3, 1);
-    door.rotation.y = (t.entering ? doorProgress : 1 - Math.max(0, (progress - 0.7) / 0.3)) * -Math.PI * 0.57;
-    let p = t.entering ? Math.max(0, (progress - 0.12) / 0.88) : progress;
+    if (t.kind === 'entering') door.rotation.y = Math.min(progress / 0.3, 1) * -Math.PI * 0.57;
+    else if (t.kind === 'leaving') door.rotation.y = (1 - Math.max(0, (progress - 0.7) / 0.3)) * -Math.PI * 0.57;
+    let p = t.kind === 'entering' ? Math.max(0, (progress - 0.12) / 0.88) : progress;
     p = p * p * (3 - 2 * p);
-    camera.fov = THREE.MathUtils.lerp(t.entering ? outsideFov : insideFov, t.entering ? insideFov : outsideFov, p);
-    camera.updateProjectionMatrix();
+    camera.fov = THREE.MathUtils.lerp(t.fromFov, t.to.fov, p);
+    offset.lerpVectors(t.fromOffset, t.to.offset, p);
     // A waypoint in front of the door avoids clipping through the side wall.
     const mid = new THREE.Vector3(0.1, 3.25, 6.9);
-    const start = t.entering ? t.from : t.to;
-    const end = t.entering ? t.to : t.from;
-    const path = new THREE.CatmullRomCurve3([start, mid, end]);
-    camera.position.copy(path.getPoint(t.entering ? p : 1 - p));
-    camera.lookAt(new THREE.Vector3().lerpVectors(t.targetFrom, t.targetTo, p));
-    roof.visible = t.entering ? progress < 0.65 : progress > 0.35;
+    if (t.kind === 'moving-to-flowers') camera.position.lerpVectors(t.from, t.to.position, p);
+    else {
+      const start = t.kind === 'entering' ? t.from : t.to.position;
+      const end = t.kind === 'entering' ? t.to.position : t.from;
+      const path = new THREE.CatmullRomCurve3([start, mid, end]);
+      camera.position.copy(path.getPoint(t.kind === 'entering' ? p : 1 - p));
+    }
+    look.lerpVectors(t.fromTarget, t.to.target, p); project();
+    roof.visible = t.kind === 'entering' ? progress < 0.65 : t.kind === 'leaving' && progress > 0.35;
     if (progress === 1) {
-      phase = t.entering ? 'inside' : 'outside'; roof.visible = phase === 'outside';
-      camera.position.copy(t.to); camera.lookAt(t.targetTo); door.rotation.y = t.entering ? -Math.PI * 0.57 : 0;
+      phase = t.destination; roof.visible = phase === 'outside';
+      applyPose(phase); door.rotation.y = phase === 'outside' ? 0 : -Math.PI * 0.57;
       transition = null; onVisitComplete(phase);
       renderer.shadowMap.needsUpdate = true;
     }
@@ -79,8 +94,8 @@ export function createWorld(container, { onFlower, onVisitComplete, reducedMotio
     if (disposed || document.hidden) { lastTime = null; return; }
     const dt = lastTime === null ? 0 : Math.min((now - lastTime) / 1000, 0.15); lastTime = now; elapsed += dt;
     if (transition) updateTransition();
-    cat.update(elapsed, reduced, phase === 'inside'); draw();
-    if ((!reduced && !paused && phase === 'inside') || transition) frame = requestAnimationFrame(animate);
+    cat.update(elapsed, reduced, phase === 'introducing'); draw();
+    if ((!reduced && !paused && phase === 'introducing') || transition) frame = requestAnimationFrame(animate);
   }
   function startLoop() { if (frame === null && !document.hidden && !disposed) { lastTime = null; frame = requestAnimationFrame(animate); } }
   function visibility() { if (document.hidden && frame !== null) { cancelAnimationFrame(frame); frame = null; lastTime = null; } else startLoop(); }
@@ -99,18 +114,18 @@ export function createWorld(container, { onFlower, onVisitComplete, reducedMotio
     return object?.userData.flowerId;
   }
   function down(e) { pointerStart = { x: e.clientX, y: e.clientY }; }
-  function up(e) { if (pointerStart && Math.hypot(e.clientX - pointerStart.x, e.clientY - pointerStart.y) < 8 && !transition) { const id = hit(e); if (id) onFlower(id); } pointerStart = null; }
-  function move(e) { if (e.pointerType !== 'touch') renderer.domElement.style.cursor = !transition && hit(e) ? 'pointer' : 'default'; }
+  function up(e) { if (pointerStart && Math.hypot(e.clientX - pointerStart.x, e.clientY - pointerStart.y) < 8 && phase === 'browsing' && !transition) { const id = hit(e); if (id) onFlower(id); } pointerStart = null; }
+  function move(e) { if (e.pointerType !== 'touch') renderer.domElement.style.cursor = phase === 'browsing' && !transition && hit(e) ? 'pointer' : 'default'; }
   const observer = new ResizeObserver(resize); observer.observe(container);
   renderer.domElement.addEventListener('pointerdown', down); renderer.domElement.addEventListener('pointerup', up); renderer.domElement.addEventListener('pointermove', move);
   document.addEventListener('visibilitychange', visibility);
   resize(); startLoop();
   return {
-    enter: () => travel(true), leave: () => travel(false),
-    setReducedMotion(value) { reduced = value; cat.update(elapsed, reduced, phase === 'inside'); draw(); startLoop(); },
+    enter: () => travel('entering'), browse: () => travel('moving-to-flowers'), leave: () => travel('leaving'),
+    setReducedMotion(value) { reduced = value; cat.update(elapsed, reduced, phase === 'introducing'); draw(); startLoop(); },
     setPaused(value) { paused = value; if (!value) startLoop(); },
     get phase() { return phase; },
-    renderer, scene, camera, pickables,
+    renderer, scene, camera,
     dispose() {
       disposed = true; if (frame !== null) cancelAnimationFrame(frame); observer.disconnect();
       document.removeEventListener('visibilitychange', visibility);

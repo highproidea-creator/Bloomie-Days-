@@ -46,7 +46,7 @@ export function label(parent, text, position, width, height, { color = '#745b4a'
   return plane;
 }
 
-export function disposeScene(scene) {
+export function disposeScene(scene, { disposeMaterials = true } = {}) {
   const geometries = new Set(), sceneMaterials = new Set(), textures = new Set();
   scene.traverse(object => {
     if (object.geometry) geometries.add(object.geometry);
@@ -55,6 +55,9 @@ export function disposeScene(scene) {
       for (const value of Object.values(material)) if (value?.isTexture) textures.add(value);
     }
   });
-  geometries.forEach(g => g.dispose()); sceneMaterials.forEach(m => m.dispose()); textures.forEach(t => t.dispose());
-  materials.clear();
+  geometries.forEach(g => g.dispose());
+  if (disposeMaterials) {
+    sceneMaterials.forEach(m => m.dispose()); textures.forEach(t => t.dispose());
+    materials.clear();
+  }
 }

@@ -94,7 +94,7 @@ export function buildShop(scene) {
   box(shop, '#b3bf9e', [-1.48, 0.79, -0.25], [2.6, 1.15, 1.0]);
   for (let i = 0; i < 9; i++) box(shop, '#c5cfb3', [-2.62 + i * 0.285, 0.78, 0.28], [0.16, 1.0, 0.04]);
   box(shop, '#f4dfc0', [-1.48, 1.42, -0.25], [2.83, 0.17, 1.14], 0.08);
-  label(shop, 'with love, Mali', [-1.48, 0.9, 0.315], 1.8, 0.35, { fontSize: 146, color: '#809374', background: '#c5cfb3' });
+  label(shop, 'with love, Flora', [-1.48, 0.9, 0.315], 1.8, 0.35, { fontSize: 146, color: '#809374', background: '#c5cfb3' });
   plant(shop, flowers[1], [-2.35, 1.51, -0.22], { scale: 0.57, count: 3, potColor: '#f3d9c5' });
   box(shop, '#e9b9bc', [-0.75, 1.55, -0.3], [0.48, 0.12, 0.3]);
   const cat = makeCat(shop); cat.group.position.set(0.35, 0.22, -0.65);
