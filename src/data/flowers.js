@@ -26,10 +26,11 @@ const additions = [
   ['lisianthus', 'ไลเซนทัส', 'Lisianthus', 'Eustoma', '#cdb9d9', '#a491bc', 'rose', 'ความซาบซึ้งและความจริงใจ', 'กลีบม่วงอ่อนพลิ้วเหมือนผ้าบาง ไลเซนทัสเป็นคำขอบคุณสำหรับการมีใครสักคนอยู่ตรงนี้'],
   ['forget-me-not', 'ฟอร์เก็ตมีน็อต', 'Forget-me-not', 'Myosotis', '#a8c8e1', '#f2d78d', 'star', 'ความทรงจำที่ยังอยู่เสมอ', 'ดอกฟ้าเล็กมีใจกลางสีเหลือง ฟอร์เก็ตมีน็อตเก็บเรื่องราวอุ่น ๆ ไว้เหมือนสมุดบันทึกเล่มจิ๋ว'],
   ['babys-breath', 'ยิปโซ', "Baby’s breath", 'Gypsophila', '#fff8e9', '#e8ddb6', 'hydrangea', 'ความรักที่อ่อนโยนและยั่งยืน', 'ดอกขาวเล็กมากมายรวมตัวราวกับละอองเมฆ ยิปโซเติมความนุ่มนวลให้พื้นที่รอบตัว'],
-  ['lily-of-the-valley', 'ลิลลี่ออฟเดอะวัลเลย์', 'Lily of the valley', 'Convallaria', '#fff9ea', '#d9e1b9', 'bell', 'การกลับมาของความสุข', 'ระฆังสีขาวเล็ก ๆ ห้อยตามก้านโค้ง ราวกับกำลังกระซิบบอกว่าความสุขจะกลับมาอีกครั้ง'],
+  ['lily-of-the-valley', 'ลิลลี่แห่งหุบเขา', 'Lily of the Valley', 'Convallaria', '#fff9ea', '#d9e1b9', 'valley', 'การกลับมาของความสุข', 'ระฆังสีขาวเล็ก ๆ ห้อยตามก้านโค้ง ราวกับกำลังกระซิบบอกว่าความสุขจะกลับมาอีกครั้ง'],
   ['anemone', 'แอนีโมนี', 'Anemone', 'Anemone', '#d7b5d4', '#796b91', 'cosmos', 'ความหวังและการเฝ้ารออย่างอ่อนโยน', 'กลีบม่วงชมพูโอบเกสรสีเข้ม แอนีโมนีมีความงามเรียบง่ายที่ชวนให้หยุดมอง'],
   ['ranunculus', 'รานังคูลัส', 'Ranunculus', 'Ranunculus', '#efc3ac', '#d7a38c', 'rose', 'เสน่ห์และความชื่นชม', 'กลีบสีแอปริคอตเรียงซ้อนเป็นวงเล็ก ๆ เหมือนริบบิ้นที่ม้วนไว้อย่างตั้งใจ'],
-  ['iris', 'ไอริส', 'Iris', 'Iris', '#afa3d0', '#e6cd86', 'orchid', 'ความเชื่อมั่นและปัญญา', 'กลีบสีม่วงโค้งอย่างสง่างาม ไอริสเป็นกำลังใจให้เชื่อในเส้นทางที่เราเลือกเดิน'],
+  ['iris', 'ไอริส', 'Iris', 'Iris', '#afa3d0', '#e6cd86', 'iris', 'ความเชื่อมั่นและปัญญา', 'กลีบตั้งสามกลีบและกลีบโค้งลงสามกลีบ มีแต้มสีทองอ่อน ไอริสเป็นกำลังใจให้เชื่อในเส้นทางที่เราเลือกเดิน'],
+  ['snowdrop', 'สโนว์ดรอป', 'Snowdrop', 'Galanthus', '#fffdf2', '#a9bf93', 'snowdrop', 'ความหวังแรกหลังวันหนาว', 'ดอกสีขาวห้อยจากก้านโค้ง กลีบนอกยาวโอบกลีบในแต้มเขียว สโนว์ดรอปบอกว่าความอบอุ่นกำลังกลับมา'],
   ['daffodil', 'แดฟโฟดิล', 'Daffodil', 'Narcissus', '#f2dc94', '#dcb35d', 'lily', 'การเริ่มต้นฤดูใหม่', 'ดอกเหลืองอ่อนเหมือนแสงแรกของฤดูใบไม้ผลิ แดฟโฟดิลชวนให้เริ่มต้นใหม่ด้วยใจเบา ๆ'],
   ['poppy', 'ป๊อปปี้', 'Poppy', 'Papaver', '#dfa19b', '#816c66', 'cosmos', 'ความทรงจำและการพักใจ', 'กลีบสีปะการังดูเบาเหมือนกระดาษบาง ป๊อปปี้ชวนให้พักจากวันที่เร่งรีบสักครู่'],
   ['hibiscus', 'ชบา', 'Hibiscus', 'Hibiscus', '#e7acb6', '#d8ba76', 'star', 'ความงามที่เรียบง่าย', 'กลีบชมพูแผ่ออกอย่างเปิดเผย ชบาเติมบรรยากาศสดใสเหมือนสวนหน้าบ้านในวันสบาย ๆ'],
@@ -57,14 +58,21 @@ const additions = [
   ['mock-orange', 'แก้ว', 'Orange jasmine', 'Murraya', '#fffae8', '#e7d7a2', 'star', 'ความใสสะอาดและความอบอุ่นของบ้าน', 'ดอกสีขาวกลีบเล็กเรียบง่าย ดอกแก้วเป็นเหมือนคำต้อนรับจากสวนหน้าบ้านที่คุ้นเคย'],
 ];
 
-export const flowers = Object.freeze([...originals, ...additions.map(([id, name, english, family, color, center, form, meaning, description]) => ({ id, name, english, family, color, center, form, meaning, description }))]);
+const catalog = [...originals, ...additions.map(([id, name, english, family, color, center, form, meaning, description]) => ({ id, name, english, family, color, center, form, meaning, description }))];
+const whiteOnly = new Set(['lily-of-the-valley','snowdrop','jasmine','gardenia','mock-orange','babys-breath']);
+const petalCounts = { poppy:4, anemone:6, gerbera:16, zinnia:12, aster:18, calendula:14, camellia:9, gardenia:8 };
+export const flowers = Object.freeze(catalog.map(flower => ({ ...flower,
+  petalCount: petalCounts[flower.id],
+  leafShape: ['lily','iris','snowdrop','valley','bell'].includes(flower.form) ? 'strap' : flower.form==='lavender' ? 'slender' : 'oval',
+  colors: [{ value:flower.color, label:'สีประจำดอก' }, ...(!whiteOnly.has(flower.id) ? [{value:'#fff9ed',label:'ขาวครีม'},{value:'#e8b4c4',label:'ชมพูพาสเทล'}].filter(c=>c.value!==flower.color) : [])],
+})));
 
 export const flowerById = new Map(flowers.map(flower => [flower.id, flower]));
 
 /** Validates new catalog entries before rendering; no fixed-size indexing. */
 export function validateCatalog(catalog) {
   const ids = new Set();
-  const supported = new Set(['tulip', 'daisy', 'rose', 'lavender', 'sunflower', 'hydrangea', 'cosmos', 'peony', 'lily', 'orchid', 'star', 'bell']);
+  const supported = new Set(['tulip', 'daisy', 'rose', 'lavender', 'sunflower', 'hydrangea', 'cosmos', 'peony', 'lily', 'orchid', 'star', 'bell', 'valley', 'snowdrop', 'iris']);
   for (const flower of catalog) {
     if (!flower.id || ids.has(flower.id)) throw new Error(`Duplicate or missing flower ID: ${flower.id}`);
     ids.add(flower.id);
@@ -73,6 +81,7 @@ export function validateCatalog(catalog) {
     }
     if (!supported.has(flower.form)) throw new Error(`Unknown flower form: ${flower.form}`);
     for (const field of ['color', 'center']) if (!/^#[\da-f]{6}$/i.test(flower[field])) throw new Error(`Invalid ${field}: ${flower.id}`);
+    if (!flower.colors?.length || !flower.colors.every(c=>/^#[\da-f]{6}$/i.test(c.value)&&c.label)) throw new Error(`Invalid colors: ${flower.id}`);
   }
   return true;
 }

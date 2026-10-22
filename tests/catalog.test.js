@@ -12,7 +12,8 @@ import { Box3 } from 'three';
 
 test('the catalog has at least 50 distinct, complete flower types', () => {
   assert.ok(flowers.length >= 50);
-  assert.equal(new Set(flowers.map(f => f.english)).size, flowers.length);
+  assert.equal(new Set(flowers.map(f => f.english.toLowerCase())).size, flowers.length);
+  assert.equal(new Set(flowers.map(f => f.name)).size, flowers.length);
   assert.equal(validateCatalog(flowers), true);
 });
 test('catalog accepts 100 flowers without a fixed-size limit', () => {
@@ -94,7 +95,7 @@ test('search supports Thai, case-insensitive English, empty queries and no match
   assert.equal(getCatalogPage(flowers, { query: '' }).total, flowers.length);
 });
 
-test('all 50 catalog entries produce finite, nonempty 3D flower geometry', () => {
+test('all catalog entries produce finite, nonempty 3D flower geometry', () => {
   for (const flower of flowers) {
     const model = makeFlower(flower), bounds = new Box3().setFromObject(model);
     assert.equal(model.userData.flowerId, flower.id);

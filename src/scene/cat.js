@@ -64,13 +64,14 @@ export function makeCat(parent) {
   mergeClay(tail); mergeClay(rightArm);
   return {
     group: cat,
-    update(time, reduced, welcoming) {
+    update(time, reduced, welcoming, inviting = false) {
       const cycle = time % 4.8;
       const blink = !reduced && cycle > 4.5 ? 1 - Math.sin((cycle - 4.5) / 0.3 * Math.PI) * 0.94 : 1;
       for (const eye of eyes) eye.scale.y = blink;
       tail.rotation.y = reduced ? 0.3 : 0.3 + Math.sin(time * 1.6) * 0.4;
       head.rotation.z = reduced ? 0 : Math.sin(time * 0.65) * 0.025;
       rightArm.rotation.z = -0.6 + (!reduced && welcoming ? Math.sin(time * 5) * 0.21 : 0);
+      if(inviting&&!reduced){rightArm.rotation.z=-.95+Math.sin(time*4)*.3;head.rotation.z=-.06;}
     },
   };
 }

@@ -28,7 +28,7 @@ export function createWorld(container, { onFlower, onVisitComplete, reducedMotio
   };
   const look = poses.outside.target.clone(), offset = new THREE.Vector2();
   let reduced = reducedMotion, transition = null, phase = 'outside', elapsed = 0, lastTime = null, frame = null, disposed = false, paused = false;
-  let pointerStart = null;
+  let pointerStart = null, inviting = false;
 
   function project() {
     const width = container.clientWidth, height = container.clientHeight;
@@ -82,6 +82,7 @@ export function createWorld(container, { onFlower, onVisitComplete, reducedMotio
     roof.visible = t.kind === 'entering' ? progress < 0.65 : t.kind === 'leaving' && progress > 0.35;
     if (progress === 1) {
       phase = t.destination; roof.visible = phase === 'outside';
+      if(phase==='outside')inviting=false;
       applyPose(phase); door.rotation.y = phase === 'outside' ? 0 : -Math.PI * 0.57;
       transition = null; onVisitComplete(phase);
       renderer.shadowMap.needsUpdate = true;
@@ -94,7 +95,7 @@ export function createWorld(container, { onFlower, onVisitComplete, reducedMotio
     if (disposed || document.hidden) { lastTime = null; return; }
     const dt = lastTime === null ? 0 : Math.min((now - lastTime) / 1000, 0.15); lastTime = now; elapsed += dt;
     if (transition) updateTransition();
-    cat.update(elapsed, reduced, phase === 'introducing'); draw();
+    cat.update(elapsed, reduced, phase === 'introducing', inviting); draw();
     if ((!reduced && !paused && phase === 'introducing') || transition) frame = requestAnimationFrame(animate);
   }
   function startLoop() { if (frame === null && !document.hidden && !disposed) { lastTime = null; frame = requestAnimationFrame(animate); } }
@@ -122,6 +123,7 @@ export function createWorld(container, { onFlower, onVisitComplete, reducedMotio
   resize(); startLoop();
   return {
     enter: () => travel('entering'), browse: () => travel('moving-to-flowers'), leave: () => travel('leaving'),
+    invite(){inviting=true;startLoop();},
     setReducedMotion(value) { reduced = value; cat.update(elapsed, reduced, phase === 'introducing'); draw(); startLoop(); },
     setPaused(value) { paused = value; if (!value) startLoop(); },
     get phase() { return phase; },

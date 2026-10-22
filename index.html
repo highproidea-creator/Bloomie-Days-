@@ -29,7 +29,7 @@
 
       <section id="flower-browser" class="flower-panel" aria-labelledby="browser-title" hidden>
         <div class="panel-topline"><span class="eyebrow">A LITTLE DEEPER INTO THE SHOP</span><span class="flower-count">50 BLOOMS</span></div>
-        <h2 id="browser-title" tabindex="-1">ดอกไหนทำให้ใจคุณยิ้ม <span aria-hidden="true">✿</span></h2>
+        <h2 id="browser-title" tabindex="-1">เลือกดอกไม้ให้คนพิเศษ <span aria-hidden="true">✿</span></h2>
         <p class="panel-description">ค่อย ๆ เลือก แล้วแตะดอกไม้เพื่ออ่านเรื่องราว</p>
         <label class="flower-search">ค้นหาดอกไม้<input id="flower-search" type="search" placeholder="ชื่อไทย / English" autocomplete="off" /></label>
         <p id="catalog-results" class="catalog-results" role="status" aria-live="polite"></p>
@@ -38,7 +38,8 @@
         <nav class="catalog-pagination" aria-label="หน้ารายการดอกไม้"><button id="previous-page">ก่อนหน้า</button><span id="catalog-page"></span><button id="next-page">ถัดไป</button></nav>
       </section>
 
-      <section id="greeting" class="greeting" aria-labelledby="greeting-name" hidden><div class="cat-avatar" aria-hidden="true">✿</div><div><div class="eyebrow">A WARM WELCOME</div><h2 id="greeting-name" tabindex="-1">ฟลอร่า <span>เจ้าของร้านดอกไม้</span></h2><p id="greeting-text">ยินดีต้อนรับค่ะ ฉันชื่อฟลอร่า เมี้ยว~<br />วันนี้ให้ดอกไม้ดูแลหัวใจคุณนะคะ</p><button id="continue-button" class="primary-button">ไปชมดอกไม้กันค่ะ</button></div></section>
+      <section id="bouquet-studio" aria-label="สตูดิโอจัดช่อดอกไม้" hidden></section>
+      <section id="greeting" class="greeting" aria-labelledby="greeting-name" hidden><div class="cat-avatar" aria-hidden="true">✿</div><div><div class="eyebrow">A WARM WELCOME</div><h2 id="greeting-name" tabindex="-1">ฟลอร่า <span>เจ้าของร้านดอกไม้</span></h2><p id="greeting-text">สวัสดีนะเมี้ยว~ ตามหาดอกไม้ให้คนพิเศษอยู่ใช่มั้ย? ตามมาเลยเมี้ยวว</p><button id="continue-button" class="primary-button">ตามฟลอร่าไปจัดช่อ</button></div></section>
       <p id="journey-status" class="journey-status" role="status" aria-live="polite" hidden></p>
       <button id="motion-button" class="motion-button" aria-pressed="false" aria-label="ลดการเคลื่อนไหว">◌ <span>เคลื่อนไหวปกติ</span></button>
       <div id="loading" class="loading" role="status"><span>✿</span><p>กำลังปลูกความสุขเล็ก ๆ…</p></div>
@@ -47,9 +48,9 @@
       <dialog id="flower-dialog" class="flower-dialog" aria-labelledby="detail-name">
         <button class="dialog-close" data-close aria-label="ปิดรายละเอียดดอกไม้">×</button>
         <div id="flower-portrait" class="flower-portrait"></div>
-        <div class="flower-detail"><div class="eyebrow">A LITTLE FLOWER STORY</div><div id="detail-family" class="detail-family"></div><h2 id="detail-name"></h2><div id="detail-english" class="detail-english"></div><p id="detail-description"></p><div class="meaning-label">ภาษาดอกไม้</div><blockquote id="detail-meaning"></blockquote><div class="detail-bottom"><span>✿</span> ค่อย ๆ รู้จักดอกไม้ไปด้วยกัน</div></div>
+        <div class="flower-detail"><div class="eyebrow">A LITTLE FLOWER STORY</div><div id="detail-family" class="detail-family"></div><h2 id="detail-name"></h2><div id="detail-english" class="detail-english"></div><p id="detail-description"></p><div class="meaning-label">ภาษาดอกไม้</div><blockquote id="detail-meaning"></blockquote><div class="detail-bottom"><span>✿</span> ค่อย ๆ รู้จักดอกไม้ไปด้วยกัน</div><button id="detail-add" class="primary-button">เพิ่มดอกไม้นี้เข้าช่อ</button></div>
       </dialog>
-      <dialog id="help-dialog" class="help-dialog" aria-labelledby="help-title"><button class="dialog-close" data-close aria-label="ปิดวิธีเล่น">×</button><div class="eyebrow">WELCOME TO BLOOMIE DAYS</div><h2 id="help-title">พื้นที่เล็ก ๆ ให้ใจได้ผลิบาน</h2><p>กด <strong>ยินดีต้อนรับ ร้านเปิดแล้วค่าา</strong> เพื่อเปิดประตู แล้วทำความรู้จัก <strong>ฟลอร่า</strong> แมวเปอร์เซียเจ้าของร้าน</p><p>อ่านคำทักทายได้ตามสบาย เมื่อพร้อม กด <strong>ไปชมดอกไม้กันค่ะ</strong> ฟลอร่าจะพาไปยังมุมดอกไม้ กล้องเคลื่อนถึงแล้วจึงจะเปิดคลังดอกไม้ให้เลือกชม</p><p>ค้นหาหรือเปลี่ยนหน้าเพื่อเลือกดอกไม้ 50 ชนิด แตะดอกที่ชอบเพื่อเปิดภาพ เรื่องราว และความหมาย ปิดรายละเอียดเพื่อกลับมารายการเดิมได้ ไม่มีเวลา ไม่มีคะแนน</p><p>ใช้ปุ่มลดการเคลื่อนไหวได้ทุกเมื่อ ระบบจะข้ามการเดินกล้อง แต่ยังรอให้คุณอ่านคำทักทายและกดไปต่อด้วยตัวเอง</p></dialog>
+      <dialog id="help-dialog" class="help-dialog" aria-labelledby="help-title"><button class="dialog-close" data-close aria-label="ปิดวิธีเล่น">×</button><div class="eyebrow">WELCOME TO BLOOMIE DAYS</div><h2 id="help-title">พื้นที่เล็ก ๆ ให้ใจได้ผลิบาน</h2><p>กด <strong>ยินดีต้อนรับ ร้านเปิดแล้วค่าา</strong> เพื่อเปิดประตู แล้วทำความรู้จัก <strong>ฟลอร่า</strong> แมวเปอร์เซียเจ้าของร้าน</p><p>อ่านคำทักทายได้ตามสบาย เมื่อพร้อม กด <strong>ตามฟลอร่าไปจัดช่อ</strong> ฟลอร่าจะพาไปยังมุมดอกไม้ กล้องเคลื่อนถึงแล้วจึงจะเปิดคลังดอกไม้ให้เลือกชม</p><p>ค้นหาดอกไม้ 51 ชนิด แตะภาพเพื่ออ่านความหมาย หรือกด + เพิ่ม เพื่อใส่ช่อ เลือกได้ 15 ชนิด ชนิดละ 12 ก้าน รวม 60 ก้าน ลากดอกไม้เพื่อจัดตำแหน่ง หรือใช้ปุ่มและช่อง X/Y/Z ในแท็บดอกไม้ที่เลือก</p><p>เลือกทรงช่อ กระดาษ โบว์ และของตกแต่งในแท็บตกแต่งช่อ ใช้ Undo / Redo ย้อนแก้ได้ บันทึกอัตโนมัติในเบราว์เซอร์นี้ เมื่อพอใจ กด จัดช่อเสร็จแล้ว ♡ เพื่อเก็บช่อฉบับสมบูรณ์</p><p>ใช้ปุ่มลดการเคลื่อนไหวได้ทุกเมื่อ ระบบจะข้ามการเดินกล้อง แต่ยังรอให้คุณอ่านคำทักทายและกดไปต่อด้วยตัวเอง</p></dialog>
     </main>
     <script type="module" src="/src/main.js"></script>
   </body>

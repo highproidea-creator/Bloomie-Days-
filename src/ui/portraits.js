@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { makeFlowerPot } from '../scene/flowers.js';
+import { makeFlower } from '../scene/flowers.js';
 import { disposeScene } from '../scene/clay.js';
 import { mergeClay } from '../scene/optimize.js';
 
@@ -12,7 +12,7 @@ export function createPortraitCache() {
 
   function fallback(flower) {
     const petals = Array.from({ length: 5 }, (_, i) => `<ellipse cx="60" cy="48" rx="11" ry="21" fill="${flower.color}" transform="rotate(${i * 72} 60 65)"/>`).join('');
-    return `data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 160"><path d="M60 120V65M60 108Q31 94 42 85Q61 88 60 108" fill="#9bb184" stroke="#8ca376" stroke-width="4"/>${petals}<circle cx="60" cy="65" r="9" fill="${flower.center}"/><path d="M39 118H81L75 151H45Z" fill="#e3c2b1"/></svg>`)}`;
+    return `data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 160"><path d="M60 120V65M60 108Q31 94 42 85Q61 88 60 108" fill="#9bb184" stroke="#8ca376" stroke-width="4"/>${petals}<circle cx="60" cy="65" r="9" fill="${flower.center}"/></svg>`)}`;
   }
 
   return {
@@ -29,7 +29,7 @@ export function createPortraitCache() {
         }
         scene = new THREE.Scene(); scene.add(new THREE.HemisphereLight('#fff4e1', '#a4b598', 3));
         const light = new THREE.DirectionalLight('#fff2db', 3); light.position.set(-3, 5, 4); scene.add(light);
-        makeFlowerPot(scene, flower, [0, 0, 0], { scale: ['lavender', 'bell'].includes(flower.form) ? 0.85 : 1, count: 3, potColor: '#e3c2b1' });
+        const bloom=makeFlower(flower,{height:1.1});bloom.position.y=0.15;scene.add(bloom);
         mergeClay(scene); renderer.render(scene, camera);
         url = renderer.domElement.toDataURL('image/png');
       } catch {

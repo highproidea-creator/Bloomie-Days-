@@ -4,6 +4,7 @@ import { createVisitState } from './core/visit.js';
 import { getCatalogPage } from './core/catalog.js';
 import { createWorld } from './scene/world.js';
 import { createPortraitCache } from './ui/portraits.js';
+import { createStudio } from './features/bouquet/studio.js';
 
 const $ = selector => document.querySelector(selector);
 const state = createVisitState();
@@ -11,6 +12,26 @@ const preference = window.matchMedia('(prefers-reduced-motion: reduce)');
 const portraits = createPortraitCache();
 let reduced = preference.matches, manualMotion = false, world = null;
 let page = 0, query = '', portraitFrame = null, disposed = false;
+let introTimer = null, invitationTimer = null;
+const studio = createStudio({ onCatalogChange: refreshCatalogButtons });
+
+function refreshCatalogButtons() {
+  const counts = new Map(); for (const stem of studio.draft.stems) counts.set(stem.flowerId,(counts.get(stem.flowerId)||0)+1);
+  for (const button of document.querySelectorAll('.add-flower')) {
+    const id=button.dataset.flowerId,reason=studio.addReason(id);button.disabled=!!reason;button.title=reason || `เพิ่ม${flowerById.get(id).name}เข้าช่อ`;
+    button.textContent=counts.has(id)?`+ เพิ่มอีก · ${counts.get(id)} ก้าน`:'+ เพิ่ม';button.closest('.flower-tile').dataset.selected=String(counts.has(id));
+  }
+  const id=$('#flower-dialog').dataset.flowerId;$('#detail-add').disabled=id?!!studio.addReason(id):false;
+}
+function scheduleIntroduction() {
+  clearTimeout(introTimer);introTimer=null;
+  if(!reduced && state.phase==='introducing' && !document.hidden && !$('#help-dialog').open) introTimer=setTimeout(finishIntroduction,6500);
+}
+function finishIntroduction() {
+  if (!world || !state.finishIntro()) return;
+  clearTimeout(introTimer);world.invite();renderPhase();
+  invitationTimer=setTimeout(()=>{if(!disposed&&world)world.browse();},reduced?0:650);
+}
 
 function stopPortraitQueue() {
   if (portraitFrame !== null) cancelAnimationFrame(portraitFrame);
@@ -25,13 +46,14 @@ function renderCatalog({ focus = false } = {}) {
   $('#flower-list').replaceChildren(); $('#flower-list').scrollTop = 0;
   for (const flower of result.entries) {
     const button = document.createElement('button'); button.className = 'flower-item'; button.dataset.flowerId = flower.id;
-    button.setAttribute('aria-label', `สำรวจ${flower.name} ${flower.english}`);
+    button.setAttribute('aria-label', `สำรวจ${flower.name} ${flower.english}`);button.title=`${flower.name} · ${flower.english}`;
     const mark = document.createElement('span'); mark.className = 'flower-mark'; mark.textContent = '✿'; mark.style.color = flower.color; mark.setAttribute('aria-hidden', 'true');
     const image = document.createElement('img'); image.alt = ''; image.width = 100; image.height = 100; image.hidden = true;
     const name = document.createElement('span'); name.className = 'flower-name'; name.textContent = flower.name;
     const english = document.createElement('span'); english.className = 'flower-english'; english.textContent = flower.english;
     button.append(mark, image, name, english); button.addEventListener('click', () => showFlower(flower.id));
-    $('#flower-list').append(button); tasks.push({ flower, image, mark });
+    const tile=document.createElement('div');tile.className='flower-tile';const add=document.createElement('button');add.className='add-flower';add.dataset.flowerId=flower.id;add.setAttribute('aria-label',`เพิ่ม${flower.name}เข้าช่อ`);add.addEventListener('click',()=>studio.add(flower.id));tile.append(button,add);
+    $('#flower-list').append(tile); tasks.push({ flower, image, mark });
   }
   $('.flower-count').textContent = `${flowers.length} BLOOMS`;
   $('#catalog-results').textContent = result.total ? `${result.start}–${result.end} จาก ${result.total} ชนิด` : 'ไม่พบดอกไม้';
@@ -50,6 +72,7 @@ function renderCatalog({ focus = false } = {}) {
     else $('#flower-list').setAttribute('aria-busy', 'false');
   }
   if (tasks.length) portraitFrame = requestAnimationFrame(nextPortrait);
+  refreshCatalogButtons();
 }
 
 function showFlower(id) {
@@ -60,9 +83,10 @@ function showFlower(id) {
   $('#detail-family').textContent = flower.family;
   $('#detail-description').textContent = flower.description;
   $('#detail-meaning').textContent = `“${flower.meaning}”`;
-  const image = document.createElement('img'); image.src = portraits.get(flower); image.alt = `ดอก${flower.name}สามมิติในกระถางดินปั้น`;
+  const image = document.createElement('img'); image.src = portraits.get(flower); image.alt = `ดอก${flower.name}เดี่ยวสามมิติ`;
   $('#flower-portrait').replaceChildren(image);
   $('#flower-dialog').dataset.flowerId = id;
+  refreshCatalogButtons();
   world.setPaused(true);
   if (!$('#flower-dialog').open) $('#flower-dialog').showModal();
 }
@@ -74,6 +98,7 @@ function renderPhase() {
   $('#inside-toolbar').hidden = !['introducing', 'browsing'].includes(phase);
   $('#greeting').hidden = phase !== 'introducing';
   $('#flower-browser').hidden = phase !== 'browsing';
+  $('#bouquet-studio').hidden = phase !== 'browsing';
   $('#open-button').disabled = !world || phase !== 'outside';
   $('#continue-button').disabled = phase !== 'introducing';
   const status = { entering: 'กำลังเปิดประตูต้อนรับคุณ…', 'moving-to-flowers': 'ตามฟลอร่าไปชมมุมดอกไม้กันนะคะ…', leaving: 'ค่อย ๆ กลับไปหน้าร้าน…' }[phase];
@@ -85,9 +110,10 @@ function finishVisit(phase) {
   if (!state.complete() || state.phase !== phase) return;
   renderPhase();
   if (phase === 'browsing') {
+    try { studio.enter(); } catch(error) { fail(error); return; }
     page = 0; query = ''; $('#flower-search').value = ''; renderCatalog();
     $('#browser-title').focus({ preventScroll: true });
-  } else if (phase === 'introducing') $('#greeting-name').focus({ preventScroll: true });
+  } else if (phase === 'introducing') { $('#greeting-name').focus({ preventScroll: true });scheduleIntroduction(); }
   else $('#open-button').focus({ preventScroll: true });
 }
 
@@ -97,29 +123,28 @@ function setMotion(value) {
   $('#motion-button').setAttribute('aria-label', value ? 'เปิดการเคลื่อนไหว' : 'ลดการเคลื่อนไหว');
   $('#motion-button span').textContent = value ? 'ลดการเคลื่อนไหวแล้ว' : 'เคลื่อนไหวปกติ';
   world?.setReducedMotion(value);
+  studio.setReducedMotion(value);scheduleIntroduction();
 }
 
 $('#open-button').addEventListener('click', () => {
   if (!world || !state.enter()) return;
   renderPhase(); world.enter();
 });
-$('#continue-button').addEventListener('click', () => {
-  if (!world || !state.finishIntro()) return;
-  renderPhase(); world.browse();
-});
+$('#continue-button').addEventListener('click', finishIntroduction);
+$('#detail-add').addEventListener('click',()=>studio.add($('#flower-dialog').dataset.flowerId));
 $('#back-button').addEventListener('click', () => {
   if (!world || !state.leave()) return;
-  stopPortraitQueue(); renderPhase(); world.leave();
+  clearTimeout(introTimer);clearTimeout(invitationTimer);studio.leave();stopPortraitQueue(); renderPhase(); world.leave();
 });
 $('#previous-page').addEventListener('click', () => { page--; renderCatalog({ focus: true }); });
 $('#next-page').addEventListener('click', () => { page++; renderCatalog({ focus: true }); });
 $('#flower-search').addEventListener('input', event => { query = event.target.value; page = 0; renderCatalog(); });
 $('#motion-button').addEventListener('click', () => { manualMotion = true; setMotion(!reduced); });
 preference.addEventListener('change', event => { if (!manualMotion) setMotion(event.matches); });
-$('#help-button').addEventListener('click', () => { world?.setPaused(true); $('#help-dialog').showModal(); });
+$('#help-button').addEventListener('click', () => { clearTimeout(introTimer);world?.setPaused(true); $('#help-dialog').showModal(); });
 document.querySelectorAll('[data-close]').forEach(button => button.addEventListener('click', () => button.closest('dialog').close()));
 document.querySelectorAll('dialog').forEach(dialog => {
-  dialog.addEventListener('close', () => world?.setPaused(false));
+  dialog.addEventListener('close', () => {world?.setPaused(false);scheduleIntroduction();});
   dialog.addEventListener('click', event => {
     if (event.target !== dialog) return;
     const rect = dialog.getBoundingClientRect();
@@ -130,7 +155,7 @@ $('#reload-button').addEventListener('click', () => window.location.reload());
 
 function fail(error) {
   console.error('Bloomie Days could not continue:', error);
-  stopPortraitQueue(); portraits.dispose(); world?.dispose(); world = null;
+  clearTimeout(introTimer);clearTimeout(invitationTimer);studio.leave();stopPortraitQueue(); portraits.dispose(); world?.dispose(); world = null;
   $('#loading').hidden = true; $('#error').hidden = false;
 }
 
@@ -144,4 +169,5 @@ requestAnimationFrame(() => setTimeout(() => {
   } catch (error) { fail(error); }
 }, 0));
 
-if (import.meta.hot) import.meta.hot.dispose(() => { disposed = true; stopPortraitQueue(); portraits.dispose(); world?.dispose(); });
+document.addEventListener('visibilitychange',scheduleIntroduction);
+if (import.meta.hot) import.meta.hot.dispose(() => { disposed = true;clearTimeout(introTimer);clearTimeout(invitationTimer);document.removeEventListener('visibilitychange',scheduleIntroduction);stopPortraitQueue();studio.dispose(); portraits.dispose(); world?.dispose(); });
