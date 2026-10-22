@@ -56,6 +56,33 @@ export function makeFlower(flower, { height = 0.95, variation = 0 } = {}) {
       petals(floret, 4, i % 3 ? color : '#c4cde5', 0.045, 0.065, 0.045);
       ball(floret, center, [0, 0.03, 0], [0.025, 0.025, 0.025]);
     }
+  } else if (form === 'lily') {
+    petals(head, 6, color, 0.18, 0.23, 0.085, 0.01);
+    for (let i = 0; i < 5; i++) {
+      const a = i * Math.PI * 2 / 5;
+      stem(head, [0, 0, 0], [Math.cos(a) * 0.09, 0.17, Math.sin(a) * 0.09], 0.009, center);
+      ball(head, center, [Math.cos(a) * 0.09, 0.17, Math.sin(a) * 0.09], [0.025, 0.035, 0.025]);
+    }
+    head.rotation.x = 0.5;
+  } else if (form === 'orchid') {
+    petals(head, 3, color, 0.12, 0.19, 0.1);
+    for (const side of [-1, 1]) {
+      const wing = ball(head, color, [side * 0.18, 0.05, 0], [0.18, 0.05, 0.12]); wing.rotation.y = side * 0.5;
+    }
+    ball(head, center, [0, 0.09, 0.12], [0.09, 0.07, 0.12]);
+    head.rotation.x = 0.8;
+  } else if (form === 'bell') {
+    stem(head, [0, -0.05, 0], [0, 0.58, 0], 0.017);
+    for (let i = 0; i < 5; i++) {
+      const side = i % 2 ? -1 : 1, y = i * 0.105;
+      stem(head, [0, y + 0.1, 0], [side * 0.12, y + 0.06, 0], 0.013);
+      cylinder(head, color, [side * 0.12, y, 0], 0.055, 0.12, 0.14);
+      ball(head, center, [side * 0.12, y - 0.065, 0], [0.055, 0.025, 0.055]);
+    }
+  } else if (form === 'star') {
+    petals(head, 5, color, 0.13, 0.17, 0.1);
+    ball(head, center, [0, 0.055, 0], [0.065, 0.055, 0.065]);
+    head.rotation.x = 0.4;
   } else {
     const sunflower = form === 'sunflower';
     petals(head, sunflower ? 13 : form === 'cosmos' ? 8 : 12, color, sunflower ? 0.2 : 0.16, sunflower ? 0.16 : 0.15, form === 'cosmos' ? 0.1 : 0.065);
