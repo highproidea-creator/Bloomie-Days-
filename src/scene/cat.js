@@ -17,9 +17,9 @@ export function makeCat(parent) {
   ball(cat, white, [-0.27, 0.15, 0.21], [0.2, 0.12, 0.28]);
   ball(cat, white, [0.27, 0.15, 0.21], [0.2, 0.12, 0.28]);
   const leftArm = ball(cat, white, [-0.46, 1.0, 0.06], [0.16, 0.33, 0.17]); leftArm.rotation.z = -0.38;
-  const rightArm = new THREE.Group(); rightArm.name = 'mali-wave'; rightArm.position.set(0.38, 1.14, 0.06); cat.add(rightArm);
+  const rightArm = new THREE.Group(); rightArm.name = 'flora-wave'; rightArm.position.set(0.38, 1.14, 0.06); cat.add(rightArm);
   ball(rightArm, white, [0.14, 0.1, 0.05], [0.17, 0.31, 0.17]); rightArm.rotation.z = -0.6;
-  const head = new THREE.Group(); head.name = 'mali-head'; head.position.y = 1.72; cat.add(head);
+  const head = new THREE.Group(); head.name = 'flora-head'; head.position.y = 1.72; cat.add(head);
   ball(head, white, [0, 0, 0], [0.62, 0.55, 0.47]);
   // Cheek ruff and forehead fluff create the Persian silhouette.
   for (let i = 0; i < 13; i++) {
@@ -36,7 +36,7 @@ export function makeCat(parent) {
   ball(head, white, [0.11, 0.49, 0.21], [0.15, 0.13, 0.19]);
   const eyes = [];
   for (const side of [-1, 1]) {
-    const eye = new THREE.Group(); eye.name = side < 0 ? 'mali-eye-left' : 'mali-eye-right'; eye.position.set(side * 0.245, 0.055, 0.425); head.add(eye);
+    const eye = new THREE.Group(); eye.name = side < 0 ? 'flora-eye-left' : 'flora-eye-right'; eye.position.set(side * 0.245, 0.055, 0.425); head.add(eye);
     ball(eye, '#675544', [0, 0, 0], [0.15, 0.18, 0.075]);
     ball(eye, '#96af98', [0, -0.01, 0.04], [0.107, 0.13, 0.052]);
     ball(eye, '#302f2c', [0, 0.003, 0.074], [0.074, 0.108, 0.025]);
@@ -56,7 +56,7 @@ export function makeCat(parent) {
     const earBow = ball(head, pink, [0.5 + side * 0.1, 0.31, 0.34], [0.115, 0.075, 0.06]); earBow.rotation.z = side * 0.3;
   }
   ball(cat, '#e6a5b8', [0, 1.22, 0.35], [0.055, 0.055, 0.045]);
-  const tail = new THREE.Group(); tail.name = 'mali-tail'; tail.position.set(0.25, 0.4, -0.18); cat.add(tail);
+  const tail = new THREE.Group(); tail.name = 'flora-tail'; tail.position.set(0.25, 0.4, -0.18); cat.add(tail);
   for (let i = 0; i < 9; i++) ball(tail, white, [0.28 + i * 0.065, Math.sin(i / 8 * Math.PI) * 0.35, -i * 0.055], [0.17, 0.17, 0.17]);
   mergeClay(cat, new Set([head, tail, rightArm]));
   mergeClay(head, new Set(eyes));
@@ -64,13 +64,14 @@ export function makeCat(parent) {
   mergeClay(tail); mergeClay(rightArm);
   return {
     group: cat,
-    update(time, reduced, welcoming) {
+    update(time, reduced, welcoming, inviting = false) {
       const cycle = time % 4.8;
       const blink = !reduced && cycle > 4.5 ? 1 - Math.sin((cycle - 4.5) / 0.3 * Math.PI) * 0.94 : 1;
       for (const eye of eyes) eye.scale.y = blink;
       tail.rotation.y = reduced ? 0.3 : 0.3 + Math.sin(time * 1.6) * 0.4;
       head.rotation.z = reduced ? 0 : Math.sin(time * 0.65) * 0.025;
       rightArm.rotation.z = -0.6 + (!reduced && welcoming ? Math.sin(time * 5) * 0.21 : 0);
+      if(inviting&&!reduced){rightArm.rotation.z=-.95+Math.sin(time*4)*.3;head.rotation.z=-.06;}
     },
   };
 }

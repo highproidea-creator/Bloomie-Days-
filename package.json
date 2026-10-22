@@ -7,7 +7,7 @@
     "dev": "vite --host 0.0.0.0",
     "build": "vite build",
     "preview": "vite preview --host 0.0.0.0",
-    "test": "node tests/catalog.test.js",
+    "test": "node tests/catalog.test.js && node tests/bouquet.test.js",
     "test:e2e": "playwright test"
   },
   "dependencies": {
